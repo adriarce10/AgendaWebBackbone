@@ -59,6 +59,10 @@ var Agenda = Backbone.Collection.extend({
         return this.filter(function(modelo) {
             return modelo.get('nombre').indexOf(cadena)>=0;
         });
+    },
+    comparator: function(cliente){
+        // ordenamos por el atributo nombre
+        return cliente.get('nombre');
     }
 });
 

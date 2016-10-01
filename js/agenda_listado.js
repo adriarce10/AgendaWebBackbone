@@ -8,19 +8,15 @@ var ContactoVista = Backbone.View.extend({
     //queremos que la vista "cuelgue" de un div
     //Esto es solo para ilustrar, ya que <div> es lo que se usa por defecto
     tagName: 'div',
-
     //queremos que la etiqueta de la que "cuelga" la vista tenga la class="contacto"
     //Así podremos darle un estilo apropiado con CSS
     className: 'contacto',
-
     //plantilla Mustache para modo visualización
     template: document.getElementById("contacto_tmpl").innerHTML,
-
     //plantilla Mustache para modo edición
     templateEdit: document.getElementById("contacto_edit_tmpl").innerHTML,
-
     //donde se genera el HTML de la vista
-    render: function() {
+    render: function () {
         //Rendering de la plantilla de mustache
         //1er parámetro: plantilla, 2º: objeto JSON con los datos
         //Aquí usamos el toJSON() de Backbone en vez del stringify estándar
@@ -29,27 +25,24 @@ var ContactoVista = Backbone.View.extend({
         //(recordemos: el nodo del que "cuelga" la vista)
         return this.el;
     },
-
     //donde se genera el HTML de la vista en modo edición
-    render_edit: function() {
+    render_edit: function () {
         this.el.innerHTML = Mustache.render(this.templateEdit, this.model.toJSON());
         //ponemos el foco de teclado en el campo de texto con el nombre
         document.getElementById("nombre_edit").focus();
         return this.el;
     },
-
     //Se dispara al pulsar sobre el botón "editar" del contacto en modo visualización
-    editar: function() {
+    editar: function () {
         //Si ya estamos editando, esto no tiene sentido
         if (editando)
             return;
         editando = true;
         //pasamos a modo edición
         this.render_edit();
-     },
-
+    },
     //Se dispara al pulsar sobre el botón "guardar"
-    guardar: function() {
+    guardar: function () {
         //tomamos los nuevos valores
         this.model.set("nombre", this.el.querySelector("#nombre_edit").value);
         this.model.set("apellidos", this.el.querySelector("#apellidos_edit").value);
@@ -63,18 +56,16 @@ var ContactoVista = Backbone.View.extend({
         //Pasamos a modo visualización
         this.render();
     },
-
-    borrar: function() {
-      this.model.destroy();
-      this.remove();
+    borrar: function () {
+        this.model.destroy();
+        this.remove();
     },
-
     //Cada contacto tiene su propio botón de editar y borrar
     //(guardar si está en modo edición)
     events: {
-        'click .boton_editar' : 'editar',
-        'click .boton_guardar' : 'guardar',
-        'click .boton_borrar' : 'borrar'
+        'click .boton_editar': 'editar',
+        'click .boton_guardar': 'guardar',
+        'click .boton_borrar': 'borrar'
     }
 
 });
@@ -85,14 +76,12 @@ var ContactoVista = Backbone.View.extend({
 var ListaContactosVista = Backbone.View.extend({
     //La vista "cuelga" de la etiqueta cuyo id="agenda"
     el: '#agenda',
-
     //plantilla HTML (aquí no usamos Mustache)
     template: document.getElementById("listado_tmpl").innerHTML,
-
-    initialize: function() {
+    initialize: function () {
         this.collection = new Agenda();
         //Le pedimos la agenda de contactos al servidor. Asíncrono!!
-        this.collection.fetch({reset:true});
+        this.collection.fetch({reset: true});
         //Cuando se produzca el "reset", dibujamos la vista.
         //Antes la colección todavía no habrá llegado del servidor
         this.listenTo(this.collection, "reset", this.render);
@@ -104,27 +93,24 @@ var ListaContactosVista = Backbone.View.extend({
         //this.renderContacto = this.renderContacto.bind(this)
 
     },
-
-    render: function() {
+    render: function () {
         this.el.innerHTML = this.template;
         //para cada contacto de la colección, llamamos a "renderContacto"
         this.collection.each(this.renderContacto);
         return this.el;
     },
-
     //Como hemos visto, llamado para cada contacto de la colección por el "each"
     //El "each" de backbone (en realidad de underscore) pasa automáticamente
     //como argumento el objeto actual de la iteración
-    renderContacto: function(contacto) {
+    renderContacto: function (contacto) {
         //Creamos una subvista para este contacto
         var contactoVista = new ContactoVista({model: contacto});
         //añadimos el HTML de la subvista a la vista "madre" (nosotros)
         this.el.appendChild(contactoVista.render());
         return this.el;
     },
-
     //Disparado al pulsar sobre el botón de nuevo contacto
-    nuevo: function() {
+    nuevo: function () {
         var nuevo_contacto = new Contacto();
         nuevo_contacto.set("nombre", this.el.querySelector('#nombre').value);
         nuevo_contacto.set("apellidos", this.el.querySelector('#apellidos').value);
@@ -132,7 +118,7 @@ var ListaContactosVista = Backbone.View.extend({
         nuevo_contacto.set("telefono", this.el.querySelector('#telefono').value);
         nuevo_contacto.set("email", this.el.querySelector('#email').value);
         nuevo_contacto.set("direccion", this.el.querySelector('#direccion').value);
-        
+
         this.collection.add(nuevo_contacto);
         //Escuchamos el evento "sync" sobre el objeto nuevo_contacto
         //que se produce cuando los datos se sincronizan OK con el servidor
@@ -142,7 +128,7 @@ var ListaContactosVista = Backbone.View.extend({
         //la magia del "bind" de JS estándar hace el resto
         //ver: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind#Example.3A_Partial_Functions
         this.listenToOnce(nuevo_contacto, "sync",
-            this.renderContacto.bind(this, nuevo_contacto));
+                this.renderContacto.bind(this, nuevo_contacto));
         //ahora guardamos el contacto. Cuando se guarde OK se disparará el evento "sync"
         nuevo_contacto.guardar();
     },
