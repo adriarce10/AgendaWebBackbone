@@ -34,7 +34,6 @@ var ContactoVista = Backbone.View.extend({
     },
     //Se dispara al pulsar sobre el botón "editar" del contacto en modo visualización
     editar: function () {
-        //Si ya estamos editando, esto no tiene sentido
         if (editando)
             return;
         editando = true;
